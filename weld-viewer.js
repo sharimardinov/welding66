@@ -70,14 +70,16 @@
       this._init = true;
       this.style.display = 'block';
       this.style.cursor = 'grab';
+      /* pan-y отдаёт вертикальный свайп странице, а горизонтальный оставляет нам:
+         без этого палец крутит деталь и одновременно скроллит страницу. */
+      this.style.touchAction = 'pan-y';
       this._start();
     }
     attributeChangedCallback() { if (this._scene) this._swap(); }
     disconnectedCallback() {
       cancelAnimationFrame(this._raf);
       this._ro && this._ro.disconnect();
-      removeEventListener('pointermove', this._move);
-      removeEventListener('pointerup', this._up);
+      this._io && this._io.disconnect();
       this._dispose(this._obj);
       this._mat && this._mat.dispose();
       this._renderer && this._renderer.dispose();
@@ -147,18 +149,25 @@
       this._swap();
 
       let dragging = false, px = 0, py = 0;
-      const down = (e) => { dragging = true; px = e.clientX; py = e.clientY; this.style.cursor = 'grabbing'; };
-      /* Kept on the instance so disconnectedCallback can take them off window again. */
-      this._move = (e) => {
+      const down = (e) => {
+        dragging = true; px = e.clientX; py = e.clientY;
+        this.style.cursor = 'grabbing';
+        /* Захват уводит все последующие события на элемент, поэтому слушатели живут
+           на нём, а не на window — курсор может уходить за границы, а на тач-экране
+           браузер сам пришлёт pointercancel, когда решит, что это скролл. */
+        this.setPointerCapture(e.pointerId);
+      };
+      const move = (e) => {
         if (!dragging) return;
         this._yaw += (e.clientX - px) * 0.008;
         this._pitch = Math.max(-0.5, Math.min(0.9, this._pitch + (e.clientY - py) * 0.005));
         px = e.clientX; py = e.clientY;
       };
-      this._up = () => { dragging = false; this.style.cursor = 'grab'; };
+      const up = () => { dragging = false; this.style.cursor = 'grab'; };
       this.addEventListener('pointerdown', down);
-      addEventListener('pointermove', this._move);
-      addEventListener('pointerup', this._up);
+      this.addEventListener('pointermove', move);
+      this.addEventListener('pointerup', up);
+      this.addEventListener('pointercancel', up);
 
       const resize = () => {
         const r = this.getBoundingClientRect();
@@ -185,7 +194,13 @@
         cam.lookAt(this._target);
         renderer.render(scene, cam);
       };
-      this._raf = requestAnimationFrame(loop);
+      /* Крутить и перерисовывать деталь, уехавшую за экран, — впустую жечь батарею;
+         на телефоне это заметная часть страницы, мимо которой долго скроллят. */
+      const play = () => { if (!this._raf) { prev = performance.now(); this._raf = requestAnimationFrame(loop); } };
+      const pause = () => { if (this._raf) { cancelAnimationFrame(this._raf); this._raf = 0; } };
+      this._io = new IntersectionObserver((es) => { es[0].isIntersecting ? play() : pause(); });
+      this._io.observe(this);
+      play();
     }
   }
   customElements.define('weld-viewer', WeldViewer);
