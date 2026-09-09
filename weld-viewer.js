@@ -76,20 +76,11 @@
     disconnectedCallback() {
       cancelAnimationFrame(this._raf);
       this._ro && this._ro.disconnect();
-      removeEventListener('pointermove', this._move);
-      removeEventListener('pointerup', this._up);
-      this._dispose(this._obj);
-      this._mat && this._mat.dispose();
       this._renderer && this._renderer.dispose();
-    }
-    /* Geometries live on the GPU; dropping the group alone would leak one buffer
-       per part on every model switch. The material is shared, so it outlives the swap. */
-    _dispose(obj) {
-      obj && obj.traverse((n) => n.geometry && n.geometry.dispose());
     }
     _swap() {
       const THREE = T();
-      if (this._obj) { this._scene.remove(this._obj); this._dispose(this._obj); }
+      if (this._obj) { this._scene.remove(this._obj); }
       const name = this.getAttribute('model') || 'bracket';
       const build = builders[name] || builders.bracket;
       this._obj = build(this._mat);
@@ -126,17 +117,16 @@
 
       let dragging = false, px = 0, py = 0;
       const down = (e) => { dragging = true; px = e.clientX; py = e.clientY; this.style.cursor = 'grabbing'; };
-      /* Kept on the instance so disconnectedCallback can take them off window again. */
-      this._move = (e) => {
+      const move = (e) => {
         if (!dragging) return;
         this._yaw += (e.clientX - px) * 0.008;
         this._pitch = Math.max(-0.5, Math.min(0.9, this._pitch + (e.clientY - py) * 0.005));
         px = e.clientX; py = e.clientY;
       };
-      this._up = () => { dragging = false; this.style.cursor = 'grab'; };
+      const up = () => { dragging = false; this.style.cursor = 'grab'; };
       this.addEventListener('pointerdown', down);
-      addEventListener('pointermove', this._move);
-      addEventListener('pointerup', this._up);
+      addEventListener('pointermove', move);
+      addEventListener('pointerup', up);
 
       const resize = () => {
         const r = this.getBoundingClientRect();
@@ -159,7 +149,7 @@
           this._obj.scale.setScalar(0.92 + 0.08 * ease);
         }
         const d = this._camDist * (1.06 - 0.06 * ease);
-        cam.position.set(d * 0.39, this._target.y + d * 0.42, d * 0.86);
+        cam.position.set(Math.sin(0.9) * d * 0.5, this._target.y + d * 0.42, d * 0.86);
         cam.lookAt(this._target);
         renderer.render(scene, cam);
       };
