@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welding66 — сварка и металлоконструкции, Екатеринбург</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-dc6639b8-cd2e-45ed-995f-facaadcd02f7/styles.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;800&display=swap">
+<script src="_ds/modernist-dc6639b8-cd2e-45ed-995f-facaadcd02f7/_ds_bundle.js"></script>
+<script src="./image-slot.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
+<script src="./weld-viewer.js"></script>
+<style>
+  /* Archivo carries no Cyrillic, so Golos Text leads both roles — otherwise the page
+     would mix two typefaces inside a single line (digits Archivo, letters Golos). */
+  :root {
+    --font-heading: "Golos Text", "Archivo", system-ui, sans-serif;
+    --font-body: "Golos Text", "Archivo", system-ui, sans-serif;
+  }
+  body { text-wrap: pretty; }
+  a { color: var(--color-accent-700); text-decoration: none; }
+  a:hover { color: var(--color-accent); }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  /* Sections carry their own padding, so the rules sit flush between them. */
+  .hr { margin: 0; }
+
+  .shell { max-width: 1160px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 24px); }
+
+  .kicker {
+    display: block; font-size: 13px; line-height: 1.4;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-accent-700); margin: 0 0 24px;
+  }
+  .caps {
+    font-size: 13px; line-height: 1.4;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-neutral-700); margin: 12px 0 0;
+  }
+  .num {
+    font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+    font-feature-settings: 'tnum' 1;
+  }
+  .stat-num {
+    font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+    font-size: clamp(32px, 3.4vw, 46px); line-height: 1.1;
+    color: var(--color-accent); margin: 0;
+  }
+  .muted { color: var(--color-neutral-800); }
+  .muted-soft { color: var(--color-neutral-700); }
+</style>
+</helmet>
+
+<div style="background:var(--color-bg);color:var(--color-text)">
+
+  <nav class="nav" style="position:sticky;top:0;z-index:5;background:var(--color-bg);padding-inline:max(24px, calc((100% - 1160px) / 2 + 24px))">
+    <a href="#" class="nav-brand" style="display:flex;align-items:center;gap:10px;color:var(--color-text);text-decoration:none">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" style="display:block;flex:none">
+        <rect width="34" height="34" fill="var(--color-accent)"></rect>
+        <path d="M7 7h6v14h14v6H7z" fill="var(--color-bg)"></path>
+        <rect x="17" y="7" width="10" height="4" fill="var(--color-bg)"></rect>
+        <rect x="23" y="13" width="4" height="4" fill="var(--color-bg)"></rect>
+      </svg>
+      <span style="letter-spacing:-0.02em">WELDING<span style="color:var(--color-accent)">66</span></span>
+    </a>
+    <a href="#works" style="white-space:nowrap">Что делаем</a>
+    <a href="#process" style="white-space:nowrap">Как работаем</a>
+    <a href="#prices" style="white-space:nowrap">Цены</a>
+    <a href="{{ telHref }}" class="btn btn-primary" style="text-decoration:none;color:var(--color-bg);white-space:nowrap">{{ phone }}</a>
+  </nav>
+
+  <div class="shell">
+
+    <section style="padding:clamp(48px,7vw,96px) 0 56px">
+      <h1 data-reveal="up" data-reveal-now style="font-size:clamp(38px,6vw,78px);line-height:1.04;letter-spacing:-0.02em;margin:0 0 28px;margin-left:-0.04em">
+        <span style="display:block">Сварка и малые</span>
+        <span style="display:block">металлоконструкции</span>
+        <span style="display:block;color:var(--color-accent)">на заказ.</span>
+      </h1>
+      <p class="muted" data-reveal="up" data-reveal-now style="font-size:17px;line-height:1.65;max-width:56ch;margin:0 0 28px">
+        Мастерская в Екатеринбурге. Делаем то, чего нет в магазине: закладные, рамы, каркасы, ограждения, лестницы, стеллажи. Своё оборудование, свой замерщик, доставка по городу и области.
+      </p>
+      <div data-reveal="up" data-reveal-now style="display:flex;gap:12px;flex-wrap:wrap">
+        <a href="#request" class="btn btn-primary" style="text-decoration:none;color:var(--color-bg);white-space:nowrap">Рассчитать заказ</a>
+        <a href="{{ telHref }}" class="btn btn-ghost" style="text-decoration:none;color:var(--color-text);white-space:nowrap">Позвонить {{ phone }}</a>
+      </div>
+    </section>
+
+    <hr class="hr">
+
+    <section style="padding:44px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:32px 24px">
+      <sc-for list="{{ stats }}" as="st" hint-placeholder-count="4">
+        <div data-reveal="up">
+          <p class="stat-num">{{ st.value }}</p>
+          <p class="caps">{{ st.label }}</p>
+        </div>
+      </sc-for>
+    </section>
+
+    <hr class="hr">
+
+    <section id="works" style="padding:56px 0 32px">
+      <span class="kicker" style="margin-bottom:32px">Что делаем</span>
+      <sc-for list="{{ works }}" as="w" hint-placeholder-count="6">
+        <div data-reveal="up" style="display:grid;grid-template-columns:minmax(56px,90px) minmax(0,360px) minmax(0,1fr);gap:14px clamp(20px,4vw,64px);align-items:baseline;padding:26px 0;border-top:2px solid var(--color-divider)">
+          <p class="num" style="font-size:15px;line-height:1.6;margin:0">{{ w.num }}</p>
+          <h2 style="font-size:23px;line-height:1.2;letter-spacing:-0.01em;margin:0">{{ w.title }}</h2>
+          <p class="muted" style="font-size:15.5px;line-height:1.65;margin:0;max-width:54ch">{{ w.copy }}</p>
+        </div>
+      </sc-for>
+    </section>
+
+    <hr class="hr">
+
+    <section id="models" style="padding:56px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px clamp(24px,5vw,72px);align-items:start">
+      <div data-reveal="left">
+        <span class="kicker">Изделия в объёме</span>
+        <h2 style="font-size:clamp(26px,3vw,36px);line-height:1.12;letter-spacing:-0.015em;margin:0 0 20px;max-width:26ch">Покрутите деталь и посмотрите, как она собрана</h2>
+        <p class="muted" style="font-size:15.5px;line-height:1.65;margin:0 0 24px;max-width:44ch">Типовые узлы, которые мы варим чаще всего. Модель вращается сама — можно потянуть мышкой.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <sc-for list="{{ models }}" as="m" hint-placeholder-count="3">
+            <button type="button" class="{{ m.cls }}" aria-pressed="{{ m.active }}" onClick="{{ m.pick }}">{{ m.label }}</button>
+          </sc-for>
+        </div>
+        <p class="muted-soft" style="font-size:13px;line-height:1.6;margin:20px 0 0">{{ modelNote }}</p>
+      </div>
+      <div data-reveal="right" style="border:2px solid var(--color-divider);background:var(--color-neutral-100)">
+        <weld-viewer model="{{ model }}" style="display:block;width:100%;aspect-ratio:4/3"></weld-viewer>
+      </div>
+    </section>
+
+    <hr class="hr">
+
+    <section style="padding:56px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px">
+      <figure class="grayscale" data-reveal="up"><image-slot id="w66-photo-1" shape="rect" fit="cover" placeholder="Фото работы: ограждение / каркас" style="width:100%;aspect-ratio:4/3"></image-slot></figure>
+      <figure class="grayscale" data-reveal="up"><image-slot id="w66-photo-2" shape="rect" fit="cover" placeholder="Фото работы: сварка в цеху" style="width:100%;aspect-ratio:4/3"></image-slot></figure>
+      <figure class="grayscale" data-reveal="up"><image-slot id="w66-photo-3" shape="rect" fit="cover" placeholder="Фото работы: готовое изделие" style="width:100%;aspect-ratio:4/3"></image-slot></figure>
+    </section>
+
+    <hr class="hr">
+
+    <section id="process" style="padding:56px 0">
+      <span class="kicker" style="margin-bottom:32px">Как работаем</span>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:28px">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+          <div data-reveal="up" style="border-top:2px solid var(--color-divider);padding-top:18px">
+            <p class="num" style="font-size:14px;color:var(--color-accent);margin:0 0 10px">{{ s.num }}</p>
+            <h3 style="font-size:19px;line-height:1.2;margin:0 0 8px">{{ s.title }}</h3>
+            <p class="muted" style="font-size:15px;line-height:1.6;margin:0">{{ s.copy }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <hr class="hr">
+
+    <section id="prices" style="padding:56px 0">
+      <span class="kicker">Цены</span>
+      <h2 data-reveal="up" style="font-size:clamp(26px,3vw,34px);line-height:1.15;letter-spacing:-0.015em;margin:0 0 28px;max-width:34ch">Ориентиры по типовым работам. Точную сумму считаем по чертежу или замеру.</h2>
+      <table class="table" data-reveal="up">
+        <thead>
+          <tr><th>Работа</th><th>Единица</th><th style="text-align:right">От</th></tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{ prices }}" as="p" hint-placeholder-count="6">
+            <tr>
+              <td>{{ p.name }}</td>
+              <td class="muted-soft">{{ p.unit }}</td>
+              <td class="num" style="text-align:right">{{ p.price }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+      <p class="muted-soft" style="font-size:13px;line-height:1.6;margin:16px 0 0">Металл считаем отдельно по факту либо работаем с материалом заказчика. Выезд на замер по Екатеринбургу — бесплатно.</p>
+    </section>
+
+    <hr class="hr">
+
+    <section id="request" style="padding:56px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px clamp(24px,5vw,80px);align-items:start">
+      <div data-reveal="left">
+        <h2 style="font-size:clamp(28px,3.4vw,40px);line-height:1.1;letter-spacing:-0.015em;margin:0 0 20px">Пришлите размеры — ответим с ценой</h2>
+        <p class="muted" style="font-size:15.5px;line-height:1.65;margin:0 0 24px;max-width:44ch">Достаточно эскиза на листе или фото места. Отвечаем в рабочее время в течение часа.</p>
+        <div style="display:grid;gap:10px;font-size:15px;line-height:1.6">
+          <div><a class="num" href="{{ telHref }}" style="font-size:24px;color:var(--color-text)">{{ phone }}</a></div>
+          <div class="muted">Екатеринбург, ул. Промышленная, 12 — цех и приём заказов</div>
+          <div class="muted">Пн–Сб, 9:00–19:00 · <a href="mailto:{{ email }}">{{ email }}</a></div>
+        </div>
+      </div>
+      <form onSubmit="{{ onSubmit }}" data-reveal="right" style="display:grid;gap:16px">
+        <div class="field"><label for="w66-name">Имя</label><input class="input" id="w66-name" name="name" type="text" autocomplete="name" placeholder="Как к вам обращаться"></div>
+        <div class="field"><label for="w66-tel">Телефон</label><input class="input" id="w66-tel" name="tel" type="tel" autocomplete="tel" placeholder="+7 ___ ___-__-__"></div>
+        <div class="field"><label for="w66-task">Что нужно сварить</label><textarea class="input" id="w66-task" name="task" placeholder="Например: рама 1200×600 из уголка 40, 2 шт."></textarea></div>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <button type="submit" class="btn btn-primary">Отправить заявку</button>
+          <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+            <span role="status" style="font-size:14px;color:var(--color-accent-700)">Заявка отправлена — перезвоним.</span>
+          </sc-if>
+        </div>
+      </form>
+    </section>
+
+  </div>
+
+  <section style="background:var(--color-accent);color:var(--color-bg)">
+    <div class="shell" style="padding-block:64px">
+      <h3 data-reveal="up" style="font-size:clamp(30px,4.2vw,52px);line-height:1.06;letter-spacing:-0.015em;margin:0 0 28px;margin-left:-0.04em">
+        <span style="display:block">Нужна одна деталь —</span>
+        <span style="display:block">сделаем одну деталь.</span>
+      </h3>
+      <a href="{{ telHref }}" class="btn btn-ghost" style="color:var(--color-bg);border-color:var(--color-bg);text-decoration:none;white-space:nowrap">Позвонить {{ phone }}</a>
+    </div>
+  </section>
+
+  <div class="shell">
+    <footer class="muted-soft" style="padding:40px 0;font-size:13px;line-height:1.6;display:flex;gap:20px;flex-wrap:wrap;justify-content:space-between">
+      <span style="display:flex;align-items:center;gap:10px">
+        <svg width="22" height="22" viewBox="0 0 34 34" aria-hidden="true" style="display:block;flex:none">
+          <rect width="34" height="34" fill="var(--color-accent)"></rect>
+          <path d="M7 7h6v14h14v6H7z" fill="var(--color-bg)"></path>
+          <rect x="17" y="7" width="10" height="4" fill="var(--color-bg)"></rect>
+          <rect x="23" y="13" width="4" height="4" fill="var(--color-bg)"></rect>
+        </svg>
+        welding66.ru — сварочные работы и малые металлоконструкции, Екатеринбург</span>
+      <span>ИП · {{ phone }} · {{ email }}</span>
+    </footer>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;phone&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;+7 343 205-66-66&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Контакты&quot;},&quot;email&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;zakaz@welding66.ru&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Контакты&quot;},&quot;compactWorks&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Содержание&quot;}}">
+const WORKS = [
+  { num: "01", title: "Закладные и кронштейны", copy: "Пластины, уголки, кронштейны под оборудование и вывески. По вашему чертежу или по образцу — от одной штуки." },
+  { num: "02", title: "Рамы и каркасы", copy: "Каркасы под столешницы, стеллажи, оборудование и мебель. Профильная труба, уголок, полоса; сварка MIG/MAG и аргон." },
+  { num: "03", title: "Ограждения и перила", copy: "Простые ограждения крылец, приямков и площадок, перила и поручни. Замер на месте, монтаж на анкеры." },
+  { num: "04", title: "Лестницы и ступени", copy: "Металлокаркас маршевых лестниц, приставные лестницы, ступени с рифлёным листом." },
+  { num: "05", title: "Мангалы, урны, козырьки", copy: "Небольшие изделия для двора и участка. Толстый металл, аккуратный шов, порошковая окраска по желанию." },
+  { num: "06", title: "Ремонт и доработка", copy: "Подварить, усилить, врезать, выправить. Ремонт прицепов, ворот, стоек, инвентаря — с выездом или в цеху." }
+];
+
+const MODELS = [
+  { id: "bracket", label: "Кронштейн", note: "Пластина + косынка: усиленный узел под нагрузку, отверстия под анкер." },
+  { id: "frame", label: "Рама / каркас", note: "Профильная труба, сварка по углам встык, средняя перемычка под столешницу." },
+  { id: "ladder", label: "Лестница", note: "Две тетивы из трубы, ступени с шагом 200 мм, площадка сверху." }
+];
+
+const STATS = [
+  { value: "11 лет", label: "в сварочном деле" },
+  { value: "2–5 дней", label: "типовой срок изготовления" },
+  { value: "1 шт.", label: "минимальный заказ" },
+  { value: "12 мес.", label: "гарантия на швы" }
+];
+
+const STEPS = [
+  { num: "01", title: "Заявка", copy: "Фото, эскиз или размеры на словах — этого хватает для первой оценки." },
+  { num: "02", title: "Замер и смета", copy: "При монтажных работах приедем и замерим сами, дальше — фиксированная цена." },
+  { num: "03", title: "Изготовление", copy: "Резка, сварка, зачистка швов, грунт или окраска. Типовые заказы — 2–5 дней." },
+  { num: "04", title: "Доставка и монтаж", copy: "Привезём по Екатеринбургу и области, при необходимости установим на месте." }
+];
+
+const PRICES = [
+  { name: "Сварочные работы в цеху", unit: "час", price: "1 200 ₽" },
+  { name: "Выездная сварка", unit: "час + выезд", price: "1 900 ₽" },
+  { name: "Закладная деталь, кронштейн", unit: "шт.", price: "600 ₽" },
+  { name: "Рама, каркас из профтрубы", unit: "п. м", price: "900 ₽" },
+  { name: "Ограждение, перила", unit: "п. м", price: "2 400 ₽" },
+  { name: "Каркас лестницы", unit: "ступень", price: "2 800 ₽" },
+  { name: "Грунт / порошковая окраска", unit: "м²", price: "700 ₽" }
+];
+
+class Component extends DCLogic {
+  state = { sent: false, model: MODELS[0].id };
+
+  componentDidMount() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const root = document;
+    const targets = Array.from(root.querySelectorAll("[data-reveal]"));
+    const prep = (n) => {
+      const dir = n.getAttribute("data-reveal");
+      const shift = dir === "left" ? "translateX(-28px)" : dir === "right" ? "translateX(28px)" : "translateY(26px)";
+      n.style.opacity = "0";
+      n.style.transform = shift;
+      n.style.transition = "opacity 640ms cubic-bezier(.2,.7,.2,1), transform 640ms cubic-bezier(.2,.7,.2,1)";
+    };
+    const show = (n, i) => {
+      n.style.transitionDelay = (i * 70) + "ms";
+      n.style.opacity = "1";
+      n.style.transform = "none";
+      setTimeout(() => { n.style.transition = ""; n.style.transitionDelay = ""; n.style.transform = ""; }, 1400 + i * 70);
+    };
+    const pending = new Set();
+    const sweep = () => {
+      this._raf = 0;
+      if (!pending.size) return;
+      const limit = innerHeight * 0.9;
+      let n = 0;
+      Array.from(pending).forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.top >= limit) return;
+        pending.delete(el);
+        show(el, r.bottom < 0 ? 0 : n++);
+      });
+    };
+    const queue = () => { if (!this._raf) this._raf = requestAnimationFrame(sweep); };
+    const scan = () => {
+      Array.from(root.querySelectorAll("[data-reveal]")).forEach((el) => {
+        if (el._revealed) return;
+        el._revealed = true;
+        prep(el);
+        pending.add(el);
+      });
+      queue();
+    };
+    scan();
+    requestAnimationFrame(() => targets.filter((n) => n.hasAttribute("data-reveal-now")).forEach((n, i) => { pending.delete(n); show(n, i); }));
+    this._onScroll = queue;
+    addEventListener("scroll", queue, { passive: true });
+    addEventListener("resize", queue);
+    this._mo = new MutationObserver(scan);
+    this._mo.observe(document.body, { childList: true, subtree: true });
+    this._moStop = setTimeout(() => { this._mo.disconnect(); this._mo = null; }, 6000);
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this._moStop);
+    this._mo && this._mo.disconnect();
+    this._raf && cancelAnimationFrame(this._raf);
+    if (this._onScroll) {
+      removeEventListener("scroll", this._onScroll);
+      removeEventListener("resize", this._onScroll);
+    }
+  }
+
+  renderVals() {
+    const phone = this.props.phone ?? "+7 343 205-66-66";
+    const email = this.props.email ?? "zakaz@welding66.ru";
+    const compact = this.props.compactWorks ?? false;
+    const cur = this.state.model;
+    return {
+      phone,
+      email,
+      telHref: "tel:" + phone.replace(/[^\d+]/g, ""),
+      model: cur,
+      modelNote: (MODELS.find((m) => m.id === cur) || MODELS[0]).note,
+      models: MODELS.map((m) => ({
+        label: m.label,
+        cls: "btn " + (m.id === cur ? "btn-primary" : "btn-ghost"),
+        active: m.id === cur ? "true" : "false",
+        pick: () => this.setState({ model: m.id })
+      })),
+      stats: STATS,
+      works: compact ? WORKS.slice(0, 4) : WORKS,
+      steps: STEPS,
+      prices: PRICES,
+      sent: this.state.sent,
+      onSubmit: (e) => { e.preventDefault(); this.setState({ sent: true }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
