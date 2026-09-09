@@ -76,11 +76,20 @@
     disconnectedCallback() {
       cancelAnimationFrame(this._raf);
       this._ro && this._ro.disconnect();
+      removeEventListener('pointermove', this._move);
+      removeEventListener('pointerup', this._up);
+      this._dispose(this._obj);
+      this._mat && this._mat.dispose();
       this._renderer && this._renderer.dispose();
+    }
+    /* Geometries live on the GPU; dropping the group alone would leak one buffer
+       per part on every model switch. The material is shared, so it outlives the swap. */
+    _dispose(obj) {
+      obj && obj.traverse((n) => n.geometry && n.geometry.dispose());
     }
     _swap() {
       const THREE = T();
-      if (this._obj) { this._scene.remove(this._obj); }
+      if (this._obj) { this._scene.remove(this._obj); this._dispose(this._obj); }
       const name = this.getAttribute('model') || 'bracket';
       const build = builders[name] || builders.bracket;
       this._obj = build(this._mat);
@@ -91,10 +100,32 @@
       this._target = bs.center.clone();
       this._spawn = performance.now();
     }
+    /* Without this the element is indistinguishable from an empty box when the CDN is
+       blocked or WebGL is off — a blank frame with the failure only in the console. */
+    _fail(msg) {
+      this.style.cursor = 'default';
+      this.style.display = 'grid';
+      this.style.placeItems = 'center';
+      this.style.padding = '24px';
+      const p = document.createElement('p');
+      p.textContent = msg;
+      p.style.cssText = 'margin:0;text-align:center;font-size:14px;line-height:1.5;color:var(--color-neutral-700)';
+      this.appendChild(p);
+    }
     _start() {
       const THREE = T();
-      if (!THREE) { setTimeout(() => this._start(), 60); return; }
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+      if (!THREE) {
+        this._waited = (this._waited || 0) + 60;
+        if (this._waited > 8000) return this._fail('Не удалось загрузить 3D-библиотеку. Проверьте, не блокирует ли расширение или антивирус запросы к cdnjs.cloudflare.com.');
+        setTimeout(() => this._start(), 60);
+        return;
+      }
+      let renderer;
+      try {
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+      } catch (err) {
+        return this._fail('Браузер не поддерживает WebGL или он отключён. Включите аппаратное ускорение в настройках браузера.');
+      }
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
       renderer.domElement.style.display = 'block';
       renderer.domElement.style.width = '100%';
@@ -117,16 +148,17 @@
 
       let dragging = false, px = 0, py = 0;
       const down = (e) => { dragging = true; px = e.clientX; py = e.clientY; this.style.cursor = 'grabbing'; };
-      const move = (e) => {
+      /* Kept on the instance so disconnectedCallback can take them off window again. */
+      this._move = (e) => {
         if (!dragging) return;
         this._yaw += (e.clientX - px) * 0.008;
         this._pitch = Math.max(-0.5, Math.min(0.9, this._pitch + (e.clientY - py) * 0.005));
         px = e.clientX; py = e.clientY;
       };
-      const up = () => { dragging = false; this.style.cursor = 'grab'; };
+      this._up = () => { dragging = false; this.style.cursor = 'grab'; };
       this.addEventListener('pointerdown', down);
-      addEventListener('pointermove', move);
-      addEventListener('pointerup', up);
+      addEventListener('pointermove', this._move);
+      addEventListener('pointerup', this._up);
 
       const resize = () => {
         const r = this.getBoundingClientRect();
