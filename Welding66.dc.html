@@ -19,7 +19,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;800&display=swap">
 <script src="_ds/modernist-dc6639b8-cd2e-45ed-995f-facaadcd02f7/_ds_bundle.js"></script>
-<script src="./image-slot.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
 <script src="./weld-viewer.js"></script>
 <style>
@@ -31,12 +30,46 @@
     --shell: 1200px;
     --gutter: 24px;
     --nav-h: 60px;
+
+    /* Одна длительность и одна кривая на роль — движение читается как система,
+       а не как набор случайных анимаций. */
+    --duration-instant: .12s;
+    --duration-fast: .16s;
+    --duration-reveal: .6s;
+    --duration-slow: .7s;
+    --ease-entrance: cubic-bezier(.215, .61, .355, 1);
+    --ease-expressive: cubic-bezier(.19, 1, .22, 1);
+    --ease-standard: cubic-bezier(.25, .46, .45, .94);
   }
 
   body { text-wrap: pretty; overflow-wrap: break-word; }
   a { color: var(--color-accent-700); text-decoration: none; }
   a:hover { color: var(--color-accent); }
   :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  a, .btn, .input, .table tbody tr {
+    transition:
+      color var(--duration-fast) var(--ease-entrance),
+      background-color var(--duration-fast) var(--ease-entrance),
+      border-color var(--duration-fast) var(--ease-entrance);
+  }
+  .btn:active { scale: var(--scale-press, .99); transition-duration: var(--duration-instant); }
+
+  .photo { margin: 0; overflow: hidden; }
+  .photo img {
+    display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover;
+    transition: scale var(--duration-slow) var(--ease-expressive);
+  }
+  .photo:hover img { scale: 1.03; }
+
+  /* Уважаем системную настройку: гасим всё движение, а не только reveal. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: .01ms !important;
+      animation-duration: .01ms !important;
+      scale: none !important;
+    }
+  }
   section[id] { scroll-margin-top: calc(var(--nav-h) + 24px); }
 
   .shell { max-width: var(--shell); margin-inline: auto; padding-inline: var(--gutter); }
@@ -201,9 +234,24 @@
       <hr class="hr">
 
       <section aria-label="Примеры работ" style="padding:clamp(48px,7vw,88px) 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px">
-        <figure class="grayscale" data-reveal="up"><image-slot id="w66-photo-1" shape="rect" fit="cover" placeholder="Фото работы: ограждение / каркас" style="width:100%;aspect-ratio:4/3"></image-slot></figure>
-        <figure class="grayscale" data-reveal="up"><image-slot id="w66-photo-2" shape="rect" fit="cover" placeholder="Фото работы: сварка в цеху" style="width:100%;aspect-ratio:4/3"></image-slot></figure>
-        <figure class="grayscale" data-reveal="up"><image-slot id="w66-photo-3" shape="rect" fit="cover" placeholder="Фото работы: готовое изделие" style="width:100%;aspect-ratio:4/3"></image-slot></figure>
+        <figure class="photo grayscale" data-reveal="up">
+          <picture>
+            <source srcset="img/welding.webp" type="image/webp">
+            <img src="img/welding.jpg" width="803" height="1402" loading="lazy" decoding="async" alt="Сварщик в защитной маске ведёт шов по профильной трубе, летят искры">
+          </picture>
+        </figure>
+        <figure class="photo grayscale" data-reveal="up">
+          <picture>
+            <source srcset="img/frame.webp" type="image/webp">
+            <img src="img/frame.jpg" width="803" height="1402" loading="lazy" decoding="async" alt="Сварной каркас из профильной трубы с зачищенными угловыми швами">
+          </picture>
+        </figure>
+        <figure class="photo grayscale" data-reveal="up">
+          <picture>
+            <source srcset="img/stairs.webp" type="image/webp">
+            <img src="img/stairs.jpg" width="803" height="1402" loading="lazy" decoding="async" alt="Металлокаркас лестницы с ограждением из чёрного профиля">
+          </picture>
+        </figure>
       </section>
 
       <hr class="hr">
@@ -254,7 +302,7 @@
           <p class="muted" style="font-size:16px;line-height:1.65;margin:0 0 32px;max-width:44ch">Достаточно эскиза на листе или фото места. Отвечаем в рабочее время в течение часа.</p>
           <address style="display:grid;gap:16px;font-size:16px;line-height:1.6;font-style:normal">
             <a class="num" href="{{ telHref }}" style="font-size:24px;line-height:1.2;color:var(--color-text)">{{ phone }}</a>
-            <span class="muted">Екатеринбург, ул. Промышленная, 12 — цех и приём заказов</span>
+            <span class="muted">г. Первоуральск, пр-кт Ильича, д&nbsp;25ак17б — цех и приём заказов</span>
             <span class="muted">Пн–Сб, 9:00–19:00 · <a href="mailto:{{ email }}">{{ email }}</a></span>
           </address>
         </div>
@@ -295,7 +343,7 @@
           <rect x="23" y="13" width="4" height="4" fill="var(--color-bg)"></rect>
         </svg>
         welding66.ru — сварочные работы и малые металлоконструкции, Екатеринбург</span>
-      <span>ИП · {{ phone }} · {{ email }}</span>
+      <span>ИП Краснопольская Е.В. · {{ phone }} · {{ email }}</span>
     </footer>
   </div>
 
@@ -353,7 +401,8 @@ class Component extends DCLogic {
       const shift = dir === "left" ? "translateX(-28px)" : dir === "right" ? "translateX(28px)" : "translateY(26px)";
       n.style.opacity = "0";
       n.style.transform = shift;
-      n.style.transition = "opacity 640ms cubic-bezier(.2,.7,.2,1), transform 640ms cubic-bezier(.2,.7,.2,1)";
+      /* Совпадает с --duration-reveal / --ease-expressive в таблице стилей. */
+      n.style.transition = "opacity 600ms cubic-bezier(.19,1,.22,1), transform 600ms cubic-bezier(.19,1,.22,1)";
     };
     const show = (n, i) => {
       n.style.transitionDelay = (i * 70) + "ms";
