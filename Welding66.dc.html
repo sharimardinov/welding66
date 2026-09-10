@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Welding66 — сварка и малые металлоконструкции в Екатеринбурге</title>
-<meta name="description" content="Сварочная мастерская в Екатеринбурге: закладные, рамы, каркасы, ограждения, лестницы, стеллажи. Изготовление от одной штуки, замер и доставка по городу и области.">
+<title>Welding66 — сварка и малые металлоконструкции, Первоуральск и Екатеринбург</title>
+<meta name="description" content="Сварочная мастерская в Первоуральске: закладные, рамы, каркасы, ограждения, лестницы, стеллажи. Изготовление от одной штуки, замер и доставка по Первоуральску, Екатеринбургу и области.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Welding66 — сварка и малые металлоконструкции">
-<meta property="og:description" content="Мастерская в Екатеринбурге. Делаем то, чего нет в магазине — от закладной пластины до каркаса лестницы.">
+<meta property="og:description" content="Цех в Первоуральске, выезд по Екатеринбургу и области. Делаем то, чего нет в магазине — от закладной пластины до каркаса лестницы.">
 <meta property="og:url" content="https://welding66.ru/">
 <meta property="og:locale" content="ru_RU">
 <script src="./support.js"></script>
@@ -117,6 +117,14 @@
 
   .table-scroll { overflow-x: auto; }
 
+  /* Ловушка для ботов: человек её не видит и не наводит табом. */
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  .form-msg { font-size: 15px; line-height: 1.5; }
+  /* В моно-палитре красный — это «обрати внимание», поэтому успех набран чернилами. */
+  .form-msg-ok { color: var(--color-neutral-800); }
+  .form-msg-err { color: var(--color-accent); }
+
   @media (max-width: 900px) {
     /* Три колонки на узком экране ужимают заголовок и описание до нечитаемых ~130px. */
     .work-row { grid-template-columns: minmax(36px, 48px) minmax(0, 1fr); gap: 10px 20px; }
@@ -180,7 +188,7 @@
           <span style="display:block;color:var(--color-accent)">на заказ.</span>
         </h1>
         <p class="muted" data-reveal="up" data-reveal-now style="font-size:17px;line-height:1.65;max-width:54ch;margin:0 0 32px">
-          Мастерская в Екатеринбурге. Делаем то, чего нет в магазине: закладные, рамы, каркасы, ограждения, лестницы, стеллажи. Своё оборудование, свой замерщик, доставка по городу и области.
+          Цех в Первоуральске, работаем по Екатеринбургу и области. Делаем то, чего нет в магазине: закладные, рамы, каркасы, ограждения, лестницы, стеллажи. Своё оборудование, свой замерщик, доставка.
         </p>
         <div data-reveal="up" data-reveal-now style="display:flex;gap:16px;flex-wrap:wrap">
           <a href="#request" class="btn btn-primary" style="text-decoration:none;color:var(--color-bg);white-space:nowrap">Рассчитать заказ</a>
@@ -291,7 +299,7 @@
             </tbody>
           </table>
         </div>
-        <p class="muted-soft" style="font-size:15px;line-height:1.6;margin:24px 0 0;max-width:60ch">Металл считаем отдельно по факту либо работаем с материалом заказчика. Выезд на замер по Екатеринбургу — бесплатно.</p>
+        <p class="muted-soft" style="font-size:15px;line-height:1.6;margin:24px 0 0;max-width:60ch">Металл считаем отдельно по факту либо работаем с материалом заказчика. Выезд на замер по Первоуральску и Екатеринбургу — бесплатно.</p>
       </section>
 
       <hr class="hr">
@@ -308,12 +316,13 @@
         </div>
         <form onSubmit="{{ onSubmit }}" data-reveal="right" style="display:grid;gap:24px">
           <div class="field"><label for="w66-name">Имя</label><input class="input" id="w66-name" name="name" type="text" autocomplete="name" placeholder="Как к вам обращаться"></div>
-          <div class="field"><label for="w66-tel">Телефон</label><input class="input" id="w66-tel" name="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 ___ ___-__-__"></div>
+          <div class="field"><label for="w66-tel">Телефон</label><input class="input" id="w66-tel" name="tel" type="tel" inputmode="tel" autocomplete="tel" required placeholder="+7 ___ ___-__-__"></div>
           <div class="field"><label for="w66-task">Что нужно сварить</label><textarea class="input" id="w66-task" name="task" rows="4" placeholder="Например: рама 1200×600 из уголка 40, 2 шт."></textarea></div>
+          <div class="hp" aria-hidden="true"><label for="w66-hp">Не заполняйте это поле</label><input id="w66-hp" name="hp" type="text" tabindex="-1" autocomplete="off"></div>
           <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-            <button type="submit" class="btn btn-primary">Отправить заявку</button>
-            <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
-              <span role="status" style="font-size:15px;line-height:1.5;color:var(--color-accent-700)">Заявка отправлена — перезвоним.</span>
+            <button type="submit" class="btn btn-primary">{{ submitLabel }}</button>
+            <sc-if value="{{ hasMsg }}" hint-placeholder-val="{{ false }}">
+              <span role="status" class="{{ msgCls }}">{{ msg }}</span>
             </sc-if>
           </div>
         </form>
@@ -342,7 +351,7 @@
           <rect x="17" y="7" width="10" height="4" fill="var(--color-bg)"></rect>
           <rect x="23" y="13" width="4" height="4" fill="var(--color-bg)"></rect>
         </svg>
-        welding66.ru — сварочные работы и малые металлоконструкции, Екатеринбург</span>
+        welding66.ru — сварочные работы и малые металлоконструкции, Первоуральск и Екатеринбург</span>
       <span>ИП Краснопольская Е.В. · {{ phone }} · {{ email }}</span>
     </footer>
   </div>
@@ -376,7 +385,7 @@ const STEPS = [
   { num: "01", title: "Заявка", copy: "Фото, эскиз или размеры на словах — этого хватает для первой оценки." },
   { num: "02", title: "Замер и смета", copy: "При монтажных работах приедем и замерим сами, дальше — фиксированная цена." },
   { num: "03", title: "Изготовление", copy: "Резка, сварка, зачистка швов, грунт или окраска. Типовые заказы — 2–5 дней." },
-  { num: "04", title: "Доставка и монтаж", copy: "Привезём по Екатеринбургу и области, при необходимости установим на месте." }
+  { num: "04", title: "Доставка и монтаж", copy: "Привезём по Первоуральску, Екатеринбургу и области, при необходимости установим на месте." }
 ];
 
 const PRICES = [
@@ -390,7 +399,7 @@ const PRICES = [
 ];
 
 class Component extends DCLogic {
-  state = { sent: false, model: MODELS[0].id };
+  state = { busy: false, msg: "", ok: false, model: MODELS[0].id };
 
   componentDidMount() {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -453,6 +462,34 @@ class Component extends DCLogic {
     }
   }
 
+  async submit(e) {
+    e.preventDefault();
+    if (this.state.busy) return;
+    const val = (id) => (document.getElementById(id) || {}).value || "";
+    const tel = val("w66-tel");
+    if (tel.replace(/\D/g, "").length < 6) {
+      this.setState({ msg: "Укажите телефон — иначе мы не сможем ответить.", ok: false });
+      return;
+    }
+    this.setState({ busy: true, msg: "" });
+    try {
+      const res = await fetch("/api/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: val("w66-name"), tel, task: val("w66-task"), hp: val("w66-hp") })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) throw new Error(data.error || "Не удалось отправить. Позвоните нам.");
+      ["w66-name", "w66-tel", "w66-task"].forEach((id) => {
+        const node = document.getElementById(id);
+        if (node) node.value = "";
+      });
+      this.setState({ busy: false, ok: true, msg: "Заявка отправлена — перезвоним." });
+    } catch (err) {
+      this.setState({ busy: false, ok: false, msg: err.message || "Не удалось отправить. Позвоните нам." });
+    }
+  }
+
   renderVals() {
     const phone = this.props.phone ?? "+7 922 127 28 29";
     const email = this.props.email ?? "zakaz@welding66.ru";
@@ -474,8 +511,11 @@ class Component extends DCLogic {
       works: compact ? WORKS.slice(0, 4) : WORKS,
       steps: STEPS,
       prices: PRICES,
-      sent: this.state.sent,
-      onSubmit: (e) => { e.preventDefault(); this.setState({ sent: true }); }
+      submitLabel: this.state.busy ? "Отправляем…" : "Отправить заявку",
+      hasMsg: !!this.state.msg,
+      msg: this.state.msg,
+      msgCls: "form-msg " + (this.state.ok ? "form-msg-ok" : "form-msg-err"),
+      onSubmit: (e) => this.submit(e)
     };
   }
 }

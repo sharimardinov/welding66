@@ -1,0 +1,22 @@
+# Вставить в /etc/nginx/sites-available/welding66.ru
+#
+# 1) Строку limit_req_zone — в блок http {} файла /etc/nginx/nginx.conf,
+#    она не может стоять внутри server {}.
+# 2) Блок location — внутрь server {}, который слушает 443.
+
+# --- в http {} ---
+# limit_req_zone $binary_remote_addr zone=w66form:10m rate=6r/m;
+
+# --- в server {} на 443 ---
+location = /api/request {
+    limit_req zone=w66form burst=3 nodelay;
+
+    proxy_pass http://127.0.0.1:8081;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+
+    proxy_read_timeout 30s;
+    proxy_send_timeout 30s;
+
+    client_max_body_size 16k;
+}

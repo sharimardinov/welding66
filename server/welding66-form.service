@@ -1,0 +1,23 @@
+[Unit]
+Description=Welding66 — приём заявок с формы
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /var/www/welding66.ru/server/form-handler.py
+EnvironmentFile=/etc/welding66/form.env
+Restart=always
+RestartSec=3
+
+DynamicUser=yes
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6
+MemoryMax=128M
+
+[Install]
+WantedBy=multi-user.target
