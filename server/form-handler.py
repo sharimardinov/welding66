@@ -6,6 +6,7 @@
 Доступы берутся из окружения, в репозитории их быть не должно.
 """
 
+import base64
 import json
 import os
 import re
@@ -58,21 +59,39 @@ def _rate_ok(ip):
 
 
 def check_credentials():
-    """Возвращает текст проблемы с доступами или None, если всё в порядке.
-
-    SMTP AUTH кодирует логин и пароль в ASCII, поэтому нелатинский символ
-    роняет отправку с UnicodeEncodeError, по которому непонятно, что
-    в конфиге просто осталось незаполненное значение.
-    """
+    """Возвращает текст проблемы с доступами или None, если всё в порядке."""
     if not SMTP_USER or not SMTP_PASS:
         return "SMTP_USER/SMTP_PASS не заданы в /etc/welding66/form.env"
-    for label, value in (("SMTP_USER", SMTP_USER), ("SMTP_PASS", SMTP_PASS)):
-        try:
-            value.encode("ascii")
-        except UnicodeEncodeError:
-            return (f"{label} содержит нелатинские символы — похоже, "
-                    f"в /etc/welding66/form.env осталось значение-заглушка")
     return None
+
+
+def _is_ascii(value):
+    try:
+        value.encode("ascii")
+        return True
+    except UnicodeEncodeError:
+        return False
+
+
+def _login(smtp):
+    """Авторизация, переживающая нелатинские пароли.
+
+    smtplib кодирует логин и пароль в ASCII и падает на кириллице, хотя
+    SASL PLAIN по RFC 4616 — это UTF-8. Поэтому в таком случае отправляем
+    команду AUTH сами.
+    """
+    if _is_ascii(SMTP_USER) and _is_ascii(SMTP_PASS):
+        smtp.login(SMTP_USER, SMTP_PASS)
+        return
+
+    smtp.ehlo_or_helo_if_needed()
+    if not smtp.has_extn("auth"):
+        raise smtplib.SMTPNotSupportedError("сервер не предлагает AUTH")
+
+    token = base64.b64encode(f"\0{SMTP_USER}\0{SMTP_PASS}".encode("utf-8")).decode("ascii")
+    code, resp = smtp.docmd("AUTH", "PLAIN " + token)
+    if code not in (235, 503):
+        raise smtplib.SMTPAuthenticationError(code, resp)
 
 
 def send_mail(name, tel, task):
@@ -95,7 +114,7 @@ def send_mail(name, tel, task):
 
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, context=context, timeout=20) as smtp:
-        smtp.login(SMTP_USER, SMTP_PASS)
+        _login(smtp)
         smtp.send_message(msg)
 
 
