@@ -57,9 +57,28 @@ def _rate_ok(ip):
     return True
 
 
+def check_credentials():
+    """Возвращает текст проблемы с доступами или None, если всё в порядке.
+
+    SMTP AUTH кодирует логин и пароль в ASCII, поэтому нелатинский символ
+    роняет отправку с UnicodeEncodeError, по которому непонятно, что
+    в конфиге просто осталось незаполненное значение.
+    """
+    if not SMTP_USER or not SMTP_PASS:
+        return "SMTP_USER/SMTP_PASS не заданы в /etc/welding66/form.env"
+    for label, value in (("SMTP_USER", SMTP_USER), ("SMTP_PASS", SMTP_PASS)):
+        try:
+            value.encode("ascii")
+        except UnicodeEncodeError:
+            return (f"{label} содержит нелатинские символы — похоже, "
+                    f"в /etc/welding66/form.env осталось значение-заглушка")
+    return None
+
+
 def send_mail(name, tel, task):
-    if not (SMTP_USER and SMTP_PASS):
-        raise RuntimeError("SMTP_USER/SMTP_PASS не заданы в окружении")
+    problem = check_credentials()
+    if problem:
+        raise RuntimeError(problem)
 
     msg = EmailMessage()
     # Имя попадает в тему, поэтому переводы строк из него уже вырезаны — иначе
@@ -144,7 +163,8 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    if not (SMTP_USER and SMTP_PASS):
-        print("ВНИМАНИЕ: SMTP_USER/SMTP_PASS не заданы — отправка работать не будет", file=sys.stderr)
+    problem = check_credentials()
+    if problem:
+        print(f"ВНИМАНИЕ: {problem} — отправка работать не будет", file=sys.stderr, flush=True)
     print(f"[form] слушаю {HOST}:{PORT}, письма на {MAIL_TO}", flush=True)
     ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()
