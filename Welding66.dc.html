@@ -439,8 +439,9 @@ class Component extends DCLogic {
   state = { busy: false, msg: "", ok: false };
 
   componentDidMount() {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Заглушить нужно всегда, даже когда движение отключено и ролик не играет.
     this.startHeroVideo();
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const root = document;
     const targets = Array.from(root.querySelectorAll("[data-reveal]"));
     const prep = (n) => {
@@ -506,6 +507,16 @@ class Component extends DCLogic {
   startHeroVideo() {
     const video = document.querySelector(".hero-video");
     if (!video) return;
+    /* Атрибут muted в разметке задаёт только defaultMuted, а свойство muted
+       берётся из него лишь у элементов, созданных парсером HTML. Рантайм
+       собирает DOM скриптом, поэтому без явной установки ролик звучит. */
+    video.muted = true;
+    video.defaultMuted = true;
+    video.volume = 0;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      video.pause();
+      return;
+    }
     const play = () => {
       const started = video.play();
       if (started && started.catch) started.catch(() => {});
