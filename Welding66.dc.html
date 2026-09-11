@@ -73,6 +73,35 @@
   .shell { max-width: var(--shell); margin-inline: auto; padding-inline: var(--gutter); }
   .hr { margin: 0; }
 
+  .hero { position: relative; isolation: isolate; }
+  .hero-body { padding-block: clamp(56px, 9vw, 120px) clamp(48px, 7vw, 88px); }
+  .hero-media { position: absolute; inset: 0; z-index: -1; overflow: hidden; background: var(--color-bg); }
+  .hero-video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  /* Видео яркое и неравномерное, а текст тёмный. Вуаль плотная слева, где стоит
+     заголовок, и почти прозрачная справа, где в кадре искры. */
+  .hero-media::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(
+      100deg,
+      var(--color-bg) 0%,
+      color-mix(in srgb, var(--color-bg) 94%, transparent) 34%,
+      color-mix(in srgb, var(--color-bg) 62%, transparent) 62%,
+      color-mix(in srgb, var(--color-bg) 38%, transparent) 100%);
+  }
+  /* Ниже 900px текст занимает всю ширину, и градиент слева направо уже не спасает —
+     нужна ровная вуаль по всему кадру. */
+  @media (max-width: 900px) {
+    .hero-media::after {
+      background: color-mix(in srgb, var(--color-bg) 82%, transparent);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-video { display: none; }
+    .hero-media {
+      background: var(--color-bg) url("img/hero-poster.jpg") center / cover no-repeat;
+    }
+  }
+
   .visually-hidden {
     position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
     overflow: hidden; clip-path: inset(50%); white-space: nowrap;
@@ -183,9 +212,14 @@
 
   <main>
 
-    <div class="shell">
-
-      <section aria-labelledby="hero-title" style="padding:clamp(56px,9vw,120px) 0 clamp(48px,7vw,88px)">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-media" aria-hidden="true">
+        <video class="hero-video" autoplay muted loop playsinline preload="metadata"
+               poster="img/hero-poster.jpg">
+          <source src="video/hero.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="shell hero-body">
         <h1 id="hero-title" data-reveal="up" data-reveal-now style="font-size:clamp(28px,7vw,80px);line-height:1.05;letter-spacing:-0.02em;margin:0 0 32px">
           <span style="display:block">Сварка и малые</span>
           <span style="display:block">металлоконструкции</span>
@@ -198,7 +232,10 @@
           <a href="#request" class="btn btn-primary" style="text-decoration:none;color:var(--color-bg);white-space:nowrap">Рассчитать заказ</a>
           <a href="{{ telHref }}" class="btn btn-ghost" style="text-decoration:none;color:var(--color-text);white-space:nowrap">Позвонить {{ phone }}</a>
         </div>
-      </section>
+      </div>
+    </section>
+
+    <div class="shell">
 
       <section class="stats" aria-labelledby="stats-title">
         <h2 id="stats-title" class="visually-hidden">Коротко о мастерской</h2>
