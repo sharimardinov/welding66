@@ -348,13 +348,15 @@
 
       <div>
         <p style="margin:0 0 4px">ИП Краснопольская Е.В.</p>
-        <p style="margin:0 0 4px">ИНН {{ inn }} · ОГРНИП {{ ogrnip }}</p>
+        <p style="margin:0 0 4px">ИНН {{ inn }}</p>
+        <p style="margin:0 0 4px">ОГРНИП {{ ogrnip }}</p>
         <p style="margin:0">г. Первоуральск, пр-кт Ильича, д.&nbsp;25ак17б</p>
       </div>
 
       <div>
         <p style="margin:0 0 4px"><a href="{{ telHref }}">{{ phone }}</a></p>
-        <p style="margin:0 0 4px"><a href="mailto:{{ email }}">{{ email }}</a></p>
+        <p style="margin:0 0 12px"><a href="mailto:{{ email }}">{{ email }}</a></p>
+        <p style="margin:0 0 4px"><a href="/requisites.html">Реквизиты для оплаты</a></p>
         <p style="margin:0"><a href="/policy.html">Политика обработки персональных данных</a></p>
       </div>
     </footer>
@@ -362,7 +364,7 @@
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;phone&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;+7 922 127 28 29&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Контакты&quot;}, &quot;email&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;zakaz@welding66.ru&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Контакты&quot;}, &quot;compactWorks&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Содержание&quot;}, &quot;inn&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;—&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Реквизиты&quot;}, &quot;ogrnip&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;—&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Реквизиты&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;phone&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;+7 922 127 28 29&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Контакты&quot;}, &quot;email&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;zakaz@welding66.ru&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Контакты&quot;}, &quot;compactWorks&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Содержание&quot;}, &quot;inn&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;662509930303&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Реквизиты&quot;}, &quot;ogrnip&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;326965800191282&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Реквизиты&quot;}}">
 const WORKS = [
   { num: "01", title: "Закладные и кронштейны", copy: "Пластины, уголки, кронштейны под оборудование и вывески. По вашему чертежу или по образцу — от одной штуки." },
   { num: "02", title: "Рамы и каркасы", copy: "Каркасы под столешницы, стеллажи, оборудование и мебель. Профильная труба, уголок, полоса; сварка MIG/MAG и аргон." },
@@ -502,8 +504,8 @@ class Component extends DCLogic {
     return {
       phone,
       email,
-      inn: this.props.inn ?? "—",
-      ogrnip: this.props.ogrnip ?? "—",
+      inn: this.props.inn ?? "662509930303",
+      ogrnip: this.props.ogrnip ?? "326965800191282",
       telHref: "tel:" + phone.replace(/[^\d+]/g, ""),
       stats: STATS,
       works: compact ? WORKS.slice(0, 4) : WORKS,
