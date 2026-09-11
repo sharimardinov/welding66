@@ -214,7 +214,7 @@
 
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-media" aria-hidden="true">
-        <video class="hero-video" autoplay muted loop playsinline preload="metadata"
+        <video class="hero-video" autoplay muted loop playsinline preload="auto"
                poster="img/hero-poster.jpg">
           <source src="video/hero.mp4" type="video/mp4">
         </video>
@@ -440,6 +440,7 @@ class Component extends DCLogic {
 
   componentDidMount() {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    this.startHeroVideo();
     const root = document;
     const targets = Array.from(root.querySelectorAll("[data-reveal]"));
     const prep = (n) => {
@@ -497,6 +498,21 @@ class Component extends DCLogic {
       removeEventListener("scroll", this._onScroll);
       removeEventListener("resize", this._onScroll);
     }
+  }
+
+  /* Автозапуск глушат режим энергосбережения на iPhone, настройка Safari для
+     конкретного сайта и экономия трафика — тогда остаётся один постер.
+     Пробуем ещё раз по первому действию пользователя. */
+  startHeroVideo() {
+    const video = document.querySelector(".hero-video");
+    if (!video) return;
+    const play = () => {
+      const started = video.play();
+      if (started && started.catch) started.catch(() => {});
+    };
+    play();
+    addEventListener("pointerdown", play, { once: true, passive: true });
+    addEventListener("scroll", play, { once: true, passive: true });
   }
 
   async submit(e) {
