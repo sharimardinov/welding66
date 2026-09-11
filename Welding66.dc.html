@@ -19,8 +19,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;800&display=swap">
 <script src="_ds/modernist-dc6639b8-cd2e-45ed-995f-facaadcd02f7/_ds_bundle.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
-<script src="./weld-viewer.js"></script>
 <style>
   /* В Archivo нет кириллицы. Если он стоит первым, буквы приходят из Golos Text,
      а цифры и латиница — из Archivo, и одна строка набирается двумя гарнитурами. */
@@ -222,39 +220,20 @@
 
       <hr class="hr">
 
-      <section id="models" aria-labelledby="models-title" style="padding:clamp(48px,7vw,88px) 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:40px clamp(32px,5vw,72px);align-items:start">
-        <div data-reveal="left">
-          <h2 id="models-title" class="kicker">Изделия в объёме</h2>
-          <h3 style="font-size:clamp(24px,3vw,36px);line-height:1.12;letter-spacing:-0.015em;margin:0 0 24px;max-width:26ch">Покрутите деталь и посмотрите, как она собрана</h3>
-          <p class="muted" style="font-size:16px;line-height:1.65;margin:0 0 32px;max-width:44ch">Типовые узлы, которые мы варим чаще всего. Модель вращается сама — можно потянуть пальцем или мышкой.</p>
-          <div role="group" aria-label="Выбор модели" style="display:flex;gap:12px;flex-wrap:wrap">
-            <sc-for list="{{ models }}" as="m" hint-placeholder-count="3">
-              <button type="button" class="{{ m.cls }}" aria-pressed="{{ m.active }}" onClick="{{ m.pick }}">{{ m.label }}</button>
-            </sc-for>
-          </div>
-          <p class="muted-soft" role="status" style="font-size:15px;line-height:1.6;margin:24px 0 0;max-width:44ch">{{ modelNote }}</p>
-        </div>
-        <div data-reveal="right" style="border:2px solid var(--color-divider);background:var(--color-neutral-100)">
-          <weld-viewer model="{{ model }}" style="display:block;width:100%;aspect-ratio:4/3"></weld-viewer>
-        </div>
-      </section>
-
-      <hr class="hr">
-
       <section aria-label="Примеры работ" style="padding:clamp(48px,7vw,88px) 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px">
-        <figure class="photo grayscale" data-reveal="up">
+        <figure class="photo" data-reveal="up">
           <picture>
             <source srcset="img/welding.webp" type="image/webp">
             <img src="img/welding.jpg" width="803" height="1402" loading="lazy" decoding="async" alt="Сварщик в защитной маске ведёт шов по профильной трубе, летят искры">
           </picture>
         </figure>
-        <figure class="photo grayscale" data-reveal="up">
+        <figure class="photo" data-reveal="up">
           <picture>
             <source srcset="img/frame.webp" type="image/webp">
             <img src="img/frame.jpg" width="803" height="1402" loading="lazy" decoding="async" alt="Сварной каркас из профильной трубы с зачищенными угловыми швами">
           </picture>
         </figure>
-        <figure class="photo grayscale" data-reveal="up">
+        <figure class="photo" data-reveal="up">
           <picture>
             <source srcset="img/stairs.webp" type="image/webp">
             <img src="img/stairs.jpg" width="803" height="1402" loading="lazy" decoding="async" alt="Металлокаркас лестницы с ограждением из чёрного профиля">
@@ -368,12 +347,6 @@ const WORKS = [
   { num: "06", title: "Ремонт и доработка", copy: "Подварить, усилить, врезать, выправить. Ремонт прицепов, ворот, стоек, инвентаря — с выездом или в цеху." }
 ];
 
-const MODELS = [
-  { id: "bracket", label: "Кронштейн", note: "Пластина + косынка: усиленный узел под нагрузку, отверстия под анкер." },
-  { id: "frame", label: "Рама / каркас", note: "Профильная труба, сварка по углам встык, средняя перемычка под столешницу." },
-  { id: "ladder", label: "Лестница", note: "Две тетивы из трубы, ступени с шагом 200 мм, площадка сверху." }
-];
-
 const STATS = [
   { value: "11 лет", label: "в сварочном деле" },
   { value: "2–5 дней", label: "типовой срок изготовления" },
@@ -399,7 +372,7 @@ const PRICES = [
 ];
 
 class Component extends DCLogic {
-  state = { busy: false, msg: "", ok: false, model: MODELS[0].id };
+  state = { busy: false, msg: "", ok: false };
 
   componentDidMount() {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -494,19 +467,10 @@ class Component extends DCLogic {
     const phone = this.props.phone ?? "+7 922 127 28 29";
     const email = this.props.email ?? "zakaz@welding66.ru";
     const compact = this.props.compactWorks ?? false;
-    const cur = this.state.model;
     return {
       phone,
       email,
       telHref: "tel:" + phone.replace(/[^\d+]/g, ""),
-      model: cur,
-      modelNote: (MODELS.find((m) => m.id === cur) || MODELS[0]).note,
-      models: MODELS.map((m) => ({
-        label: m.label,
-        cls: "btn " + (m.id === cur ? "btn-primary" : "btn-ghost"),
-        active: m.id === cur ? "true" : "false",
-        pick: () => this.setState({ model: m.id })
-      })),
       stats: STATS,
       works: compact ? WORKS.slice(0, 4) : WORKS,
       steps: STEPS,
