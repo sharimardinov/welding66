@@ -94,7 +94,7 @@ def _login(smtp):
         raise smtplib.SMTPAuthenticationError(code, resp)
 
 
-def send_mail(name, tel, task):
+def send_mail(name, tel, task, consent_at, consent_ip):
     problem = check_credentials()
     if problem:
         raise RuntimeError(problem)
@@ -105,10 +105,17 @@ def send_mail(name, tel, task):
     msg["Subject"] = f"Заявка с сайта — {name or 'без имени'}"
     msg["From"] = SMTP_USER
     msg["To"] = MAIL_TO
+    # Отметка о согласии хранится вместе с заявкой: по 152-ФЗ оператор должен
+    # уметь подтвердить, что согласие было получено. Письмо и есть эта запись.
     msg.set_content(
         f"Имя: {name or '—'}\n"
         f"Телефон: {tel}\n\n"
         f"Что нужно сварить:\n{task or '—'}\n\n"
+        f"---\n"
+        f"Согласие на обработку персональных данных: дано\n"
+        f"Дата и время: {consent_at}\n"
+        f"IP отправителя: {consent_ip}\n"
+        f"Редакция политики: welding66.ru/policy.html\n\n"
         f"— отправлено формой на welding66.ru\n"
     )
 
@@ -157,6 +164,12 @@ class Handler(BaseHTTPRequestHandler):
         if len(re.sub(r"\D", "", tel)) < 6:
             return self._reply(400, {"ok": False, "error": "Укажите телефон для связи."})
 
+        # Без согласия обрабатывать данные нельзя, поэтому проверяем и на сервере:
+        # галочку в браузере несложно обойти.
+        if data.get("consent") is not True:
+            return self._reply(400, {"ok": False,
+                                     "error": "Отметьте согласие на обработку персональных данных."})
+
         name = _one_line(data.get("name"), 120)
         task = _clean(data.get("task"))
 
@@ -166,8 +179,9 @@ class Handler(BaseHTTPRequestHandler):
         if not _rate_ok(ip):
             return self._reply(429, {"ok": False, "error": "Слишком много заявок. Позвоните нам."})
 
+        consent_at = time.strftime("%d.%m.%Y %H:%M:%S %z", time.localtime())
         try:
-            send_mail(name, tel, task)
+            send_mail(name, tel, task, consent_at, ip)
         except Exception as err:
             # Текст ошибки — в лог, наружу только общая фраза: она может
             # содержать адреса и детали SMTP.

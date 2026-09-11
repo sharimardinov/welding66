@@ -118,6 +118,12 @@
   /* Ловушка для ботов: человек её не видит и не наводит табом. */
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
+  .consent {
+    display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start;
+    font-size: 14px; line-height: 1.5; color: var(--color-neutral-800); cursor: pointer;
+  }
+  .consent input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--color-accent); flex: none; }
+
   .form-msg { font-size: 15px; line-height: 1.5; }
   /* В моно-палитре красный — это «обрати внимание», поэтому успех набран чернилами. */
   .form-msg-ok { color: var(--color-neutral-800); }
@@ -298,6 +304,10 @@
           <div class="field"><label for="w66-tel">Телефон</label><input class="input" id="w66-tel" name="tel" type="tel" inputmode="tel" autocomplete="tel" required placeholder="+7 ___ ___-__-__"></div>
           <div class="field"><label for="w66-task">Что нужно сварить</label><textarea class="input" id="w66-task" name="task" rows="4" placeholder="Например: рама 1200×600 из уголка 40, 2 шт."></textarea></div>
           <div class="hp" aria-hidden="true"><label for="w66-hp">Не заполняйте это поле</label><input id="w66-hp" name="hp" type="text" tabindex="-1" autocomplete="off"></div>
+          <label class="consent" for="w66-consent">
+            <input type="checkbox" id="w66-consent" name="consent" required>
+            <span>Я согласен на обработку персональных данных и принимаю <a href="/policy.html" target="_blank" rel="noopener">политику их обработки</a>.</span>
+          </label>
           <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
             <button type="submit" class="btn btn-primary">{{ submitLabel }}</button>
             <sc-if value="{{ hasMsg }}" hint-placeholder-val="{{ false }}">
@@ -322,22 +332,37 @@
   </main>
 
   <div class="shell">
-    <footer class="muted-soft" style="padding:40px 0;font-size:15px;line-height:1.6;display:flex;gap:16px 40px;flex-wrap:wrap;justify-content:space-between;align-items:center">
-      <span style="display:flex;align-items:center;gap:12px">
-        <svg width="24" height="24" viewBox="0 0 34 34" aria-hidden="true" style="display:block;flex:none">
-          <rect width="34" height="34" fill="var(--color-accent)"></rect>
-          <path d="M7 7h6v14h14v6H7z" fill="var(--color-bg)"></path>
-          <rect x="17" y="7" width="10" height="4" fill="var(--color-bg)"></rect>
-          <rect x="23" y="13" width="4" height="4" fill="var(--color-bg)"></rect>
-        </svg>
-        welding66.ru — сварочные работы и малые металлоконструкции, Первоуральск и Екатеринбург</span>
-      <span>ИП Краснопольская Е.В. · {{ phone }} · {{ email }}</span>
+    <footer class="muted-soft" style="padding:40px 0 48px;font-size:14px;line-height:1.6;border-top:2px solid var(--color-divider);display:grid;gap:24px clamp(32px,5vw,64px);grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+      <div>
+        <span style="display:flex;align-items:center;gap:12px;color:var(--color-text);font-family:var(--font-heading);font-weight:800;font-size:16px;margin-bottom:12px">
+          <svg width="24" height="24" viewBox="0 0 34 34" aria-hidden="true" style="display:block;flex:none">
+            <rect width="34" height="34" fill="var(--color-accent)"></rect>
+            <path d="M7 7h6v14h14v6H7z" fill="var(--color-bg)"></path>
+            <rect x="17" y="7" width="10" height="4" fill="var(--color-bg)"></rect>
+            <rect x="23" y="13" width="4" height="4" fill="var(--color-bg)"></rect>
+          </svg>
+          <span style="letter-spacing:-0.02em">WELDING<span style="color:var(--color-accent)">66</span></span>
+        </span>
+        <p style="margin:0">Сварочные работы и малые металлоконструкции.<br>Первоуральск и Екатеринбург.</p>
+      </div>
+
+      <div>
+        <p style="margin:0 0 4px">ИП Краснопольская Е.В.</p>
+        <p style="margin:0 0 4px">ИНН {{ inn }} · ОГРНИП {{ ogrnip }}</p>
+        <p style="margin:0">г. Первоуральск, пр-кт Ильича, д.&nbsp;25ак17б</p>
+      </div>
+
+      <div>
+        <p style="margin:0 0 4px"><a href="{{ telHref }}">{{ phone }}</a></p>
+        <p style="margin:0 0 4px"><a href="mailto:{{ email }}">{{ email }}</a></p>
+        <p style="margin:0"><a href="/policy.html">Политика обработки персональных данных</a></p>
+      </div>
     </footer>
   </div>
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;phone&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;+7 922 127 28 29&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Контакты&quot;},&quot;email&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;zakaz@welding66.ru&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Контакты&quot;},&quot;compactWorks&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Содержание&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;phone&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;+7 922 127 28 29&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Контакты&quot;}, &quot;email&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;zakaz@welding66.ru&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Контакты&quot;}, &quot;compactWorks&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Содержание&quot;}, &quot;inn&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;—&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Реквизиты&quot;}, &quot;ogrnip&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;—&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Реквизиты&quot;}}">
 const WORKS = [
   { num: "01", title: "Закладные и кронштейны", copy: "Пластины, уголки, кронштейны под оборудование и вывески. По вашему чертежу или по образцу — от одной штуки." },
   { num: "02", title: "Рамы и каркасы", copy: "Каркасы под столешницы, стеллажи, оборудование и мебель. Профильная труба, уголок, полоса; сварка MIG/MAG и аргон." },
@@ -444,12 +469,17 @@ class Component extends DCLogic {
       this.setState({ msg: "Укажите телефон — иначе мы не сможем ответить.", ok: false });
       return;
     }
+    const consent = !!(document.getElementById("w66-consent") || {}).checked;
+    if (!consent) {
+      this.setState({ msg: "Отметьте согласие на обработку персональных данных.", ok: false });
+      return;
+    }
     this.setState({ busy: true, msg: "" });
     try {
       const res = await fetch("/api/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: val("w66-name"), tel, task: val("w66-task"), hp: val("w66-hp") })
+        body: JSON.stringify({ name: val("w66-name"), tel, task: val("w66-task"), hp: val("w66-hp"), consent })
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.ok) throw new Error(data.error || "Не удалось отправить. Позвоните нам.");
@@ -457,6 +487,8 @@ class Component extends DCLogic {
         const node = document.getElementById(id);
         if (node) node.value = "";
       });
+      const box = document.getElementById("w66-consent");
+      if (box) box.checked = false;
       this.setState({ busy: false, ok: true, msg: "Заявка отправлена — перезвоним." });
     } catch (err) {
       this.setState({ busy: false, ok: false, msg: err.message || "Не удалось отправить. Позвоните нам." });
@@ -470,6 +502,8 @@ class Component extends DCLogic {
     return {
       phone,
       email,
+      inn: this.props.inn ?? "—",
+      ogrnip: this.props.ogrnip ?? "—",
       telHref: "tel:" + phone.replace(/[^\d+]/g, ""),
       stats: STATS,
       works: compact ? WORKS.slice(0, 4) : WORKS,
